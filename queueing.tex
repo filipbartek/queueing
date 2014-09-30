@@ -1,0 +1,426 @@
+% Deadline: end of the week (2014-06-08)
+
+% Assignment:
+% https://onedrive.live.com/view.aspx?cid=AF890009B90D6372&resid=AF890009B90D6372%211402&app=Word
+
+% Sage LaTeX:
+% https://cloud.sagemath.com/help#help-latex
+% http://www.sagemath.org/doc/tutorial/sagetex.html
+
+% Sources:
+% http://en.wikipedia.org/wiki/Queueing_theory
+% http://en.wikipedia.org/wiki/M/M/1_queue
+% http://en.wikipedia.org/wiki/M/M/c_queue
+% http://en.wikipedia.org/wiki/Geometric_series#Sum
+
+% Software:
+% http://www.moreno.marzolla.name/software/queueing/
+% http://octave.sourceforge.net/queueing/index.html
+% http://www.gnu.org/software/octave/doc/interpreter/Using-Packages.html#Using-Packages
+% http://jmt.sourceforge.net/
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\title{Stationary analysis of one channel queueing systems}
+\author{Filip Bártek}
+
+\bibliographystyle{plain}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{sagetex}
+\usepackage{url}
+
+\usepackage{hyperref} % last in preamble
+\begin{document}
+\maketitle
+
+% Assignment:
+% Analytical solution of queuing systems (QS)
+% a) QS with one channel of limited length range of queue
+% b) QS with one channel of unlimited length range of queue
+
+\section{Introduction}
+
+In this text, I will analyze some properties of M/M/1 queueing systems.
+
+Using Kendall's notation\cite{wiki:kendall},
+an M/M/c queueing system consists of:
+
+\begin{itemize}
+\item
+a memoryless arrival process,
+modeled as Poisson process with rate $\lambda$, and
+\item
+$c$ servers,
+each with a memoryless service time distribution,
+modeled as exponential distribution with rate $\mu$.
+\end{itemize}
+
+We will only analyze systems with $c = 1$, i.e.~one server.
+
+Another parameter of the queueing systems we will consider
+is their capacity,
+i.e.~the maximal number of customers allowed in the system.
+Let's denote this parameter as $K$.
+
+Altogether, we have three parameters of interest:
+
+\begin{itemize}
+\item $K$: capacity
+\item $\lambda$: arrival rate
+\item $\mu$: service rate
+\end{itemize}
+
+The state of the queueing system is the number of customers
+currently in the system (including those being served at the moment
+and those waiting in the queue). This means that a queueing system has
+exactly $K$ states.
+
+In every time $t \geq 0$, the queueing system is in one of the states.
+As time $t$ increases, the system may change state according to arrival
+process and service process. The number of customers in the system
+increases by one when new customer arrives (unless the capacity is full)
+and decreases by one when a customer service finishes.
+
+In the remainder of this text,
+we will perform stationary analysis of the system,
+i.e.~analyze the system in limit time ($t \rightarrow \infty$).
+
+\section{Analysis}
+
+In this section, we will derive the stationary state distribution
+and expected state of a queuing system
+parametrized by $K$, $\lambda$ and $\mu$.
+We will consider both finite and infinite $K$.
+
+\subsection{Distribution of states}
+
+%Let's suppose that the probability distribution of states converges.
+
+Let $\pi_i$ denote the probability that the queueing system
+is in state $i$ in limit time ($t \rightarrow \infty$).
+
+The following equation must hold for each pair of states
+$i, i+1$ ($i < K$):
+
+\begin{equation}
+\pi_i \lambda = \pi_{i+1} \mu
+\end{equation}
+
+The equation connects pairs of neighboring states.
+
+Rewriting this equation we get a formula we can use to calculate
+$\pi_{i+1}$ from $\pi_i$:
+
+\begin{equation}
+\pi_{i+1} = \pi_i \frac{\lambda}{\mu}
+\end{equation}
+
+Let $\rho$ denote $\frac{\lambda}{\mu}$.
+(We will continue to use this notation in the remainder of the text.)
+
+Using induction, we get a formula that describes $\pi_i$
+as a function of $\pi_0$, $\rho$ and $i$:
+
+\begin{equation} \label{eqn:piifrompi0}
+\pi_i = \pi_0 \rho^i
+\end{equation}
+
+This gives us a system of $K$ equations that describe
+$\pi_i$ as a function of $\pi_0$, $i$ and $\rho$
+for every $i \in \{1, \ldots, K\}$.
+
+To finish the analysis, we need to restrict the sum of probabilities:
+
+\begin{equation}
+\sum_{i=0}^K \pi_i = 1
+\end{equation}
+
+Using formula \ref{eqn:piifrompi0}, we get:
+
+\begin{align}
+\sum_{i=0}^K \pi_0 \rho^i &= 1 \\
+\pi_0 \sum_{i=0}^K \rho^i &= 1 \\
+\pi_0 &= \left( \sum_{i=0}^K \rho^i \right) ^{-1}
+\end{align}
+
+We use formula \ref{eqn:piifrompi0} again to obtain a general equation:
+
+\begin{align}
+\pi_i &= \left( \sum_{i=0}^K \rho^i \right)^{-1} \rho^i
+\label{eqn:piifromsum}
+\end{align}
+
+This is a general formula that holds for all values of $K$ and $\rho$.
+In the following sections,
+we will express the sum $\sum_{i=0}^K \rho^i$
+to obtain nicer formulas separately
+for various cases of $K$ and $\rho$.
+
+\subsubsection{Limited capacity}
+
+Let $K \in \mathbb{N}$.
+
+Let's first consider the case $\rho = 1$ (i.e.~$\lambda = \mu$).
+
+\begin{equation}
+\sum_{i=0}^K \rho^i = \sum_{i=0}^K 1 = K + 1
+\end{equation}
+
+\begin{align}
+\pi_i &= \left( \sum_{i=0}^K \rho^i \right)^{-1} \rho^i \\
+&= (K+1)^{-1} 1 \\
+&= \frac{1}{K+1}
+\end{align}
+
+This means that if arrival and service rates are equal and
+the queue is limited, the stationary distribution of states is uniform.
+
+Now let's consider $\rho \neq 1$.
+Since $\rho^i$ as a function of $i \in \{0, \ldots, K\}$
+is a geometric series, we can use
+a formula\cite[section Formula]{wiki:geometric} to express the sum:
+
+\begin{equation}
+\sum_{i=0}^K \rho^i = \frac{1 - \rho^{K+1}}{1 - \rho}
+\end{equation}
+
+Replacing the sum in formula \ref{eqn:piifromsum} we get:
+
+\begin{align}
+\pi_i &= \left( \sum_{i=0}^K \rho^i \right)^{-1} \rho^i \\
+&= \left( \frac{1 - \rho^{K+1}}{1 - \rho} \right)^{-1} \rho^i \\
+&= \frac{1 - \rho}{1 - \rho^{K+1}} \rho^i
+\end{align}
+
+Namely:
+
+\begin{equation} \label{eqn:pi0limited}
+\pi_0 = \frac{1 - \rho}{1 - \rho^{K+1}}
+\end{equation}
+
+\subsubsection{Unlimited capacity}
+
+Let $K = \infty$.
+
+If $\rho \geq 1$, the queue grows indefinitely
+and the system doesn't have a stationary distribution.
+
+Let $\rho < 1$.
+
+We can express the sum $\sum_{i=0}^K \rho^i = \sum_{i=0}^\infty \rho^i$
+using polylogarithm of order $0$:
+
+\begin{align}
+\sum_{i=0}^\infty \rho^i &= 1 + \sum_{i=1}^\infty \rho^i \\
+&= 1 + Li_0(\rho) \\
+&= 1 + \frac{\rho}{1 - \rho} \label{eqn:li0} \\
+&= \frac{(1 - \rho) + \rho}{1 - \rho} \\
+&= \frac{1}{1 - \rho}
+\end{align}
+
+In equation \ref{eqn:li0} we used expression of $Li_0$ shown in
+\cite[section Particular values]{wiki:polylogarithm}.
+
+Replacing the sum in formula \ref{eqn:piifromsum} we get:
+
+\begin{align}
+\pi_i &= \left( \sum_{i=0}^K \rho^i \right)^{-1} \rho^i \\
+&= \left( \frac{1}{1 - \rho} \right)^{-1} \rho^i \\
+&= (1 - \rho) \rho^i
+\end{align}
+
+This shows that the distribution of states is geometric
+with success probability $1 - \rho$.
+
+Namely:
+
+\begin{align}
+\pi_0 &= 1 - \rho \label{eqn:pi0unlimited}
+\end{align}
+
+\subsection{Expected number of customers}
+
+Let $E[I]$ denote the expected number of customers (i.e.~state)
+of the queueing system in limit time.
+
+\begin{align}
+E[I] &= \sum_{i=0}^K{i \pi_i} \\
+&= \sum_{i=0}^K{i \pi_0 \rho^i} \\
+&= \pi_0 \sum_{i=0}^K{i \rho^i} \label{eqn:ei}
+\end{align}
+
+Again, we will discuss cases of finite and infinite $K$ separately.
+
+\subsubsection{Limited capacity}
+
+Let $K \in \mathbb{N}$.
+
+Let $\rho = 1$.
+
+\begin{align}
+E[I] &= \pi_0 \sum_{i=0}^K{i \rho^i} \\
+&= \frac{1}{K+1} \sum_{i=0}^K{i} \\
+&= \frac{1}{K+1} \frac{(K+1)K}{2} \\
+&= \frac{K}{2}
+\end{align}
+
+Let $\rho \neq 1$.
+
+\begin{align}
+\sum_{i=0}^K{i \rho^i}
+&= \sum_{i=1}^K{i \rho^i} \\
+&= \rho \frac{1 - (K+1) \rho^K + K \rho^{K+1}}{(1 - \rho)^2}
+\label{eqn:sumirhoi}
+\end{align}
+
+Expression \ref{eqn:sumirhoi} comes from \cite[section Low-order polylogarithms]{wiki:series}.
+
+Using equation \ref{eqn:ei} and the value of $pi_0$ from equation
+\ref{eqn:pi0limited} we get:
+
+\begin{align}
+E[I]
+&= \pi_0 \sum_{i=0}^K{i \rho^i} \\
+&= \frac{1 - \rho}{1 - \rho^{K+1}}
+\rho \frac{1 - (K+1) \rho^K + K \rho^{K+1}}{(1 - \rho)^2} \\
+&= \rho \frac{1 - (K+1) \rho^K + K \rho^{K+1}}{(1 - \rho)(1 - \rho^{K+1})}
+\end{align}
+
+\subsubsection{Unlimited capacity}
+
+Let $K = \infty$.
+
+If $\rho \geq 1$, the queue grows indefinitely
+and the system doesn't have a stationary distribution.
+
+Let $\rho < 1$.
+
+We can express the sum
+$\sum_{i=0}^K{i \rho^i} = \sum_{i=0}^\infty{i \rho^i}$
+using polylogarithm of order $-1$:
+
+\begin{align}
+\sum_{i=0}^\infty{i \rho^i} &= \sum_{i=1}^\infty{i \rho^i} \\
+&= Li_{-1}(\rho) \\
+&= \frac{\rho}{(1 - \rho)^2} \label{eqn:li-1}
+\end{align}
+
+In equation \ref{eqn:li-1} we used expression of $Li_{-1}$ shown in \cite[section Particular values]{wiki:polylogarithm}.
+
+Applying equations \ref{eqn:pi0unlimited} and \ref{eqn:li-1}
+in equation \ref{eqn:ei} we get:
+
+\begin{align}
+E[I] &= \pi_0 \sum_{i=0}^K{i \rho^i} \\
+&= (1 - \rho) \frac{\rho}{(1 - \rho)^2} \\
+&= \frac{\rho}{1 - \rho}
+\end{align}
+
+\section{Conclusions}
+
+We have derived the following expressions for
+stationary state probability distribution and
+expected state of single channel queueing systems:
+
+\begin{tabular}{c | c || c | c | c}
+$K$ & $\rho$ & $\pi_i$ & $\pi_0$ & $E[I]$ \\
+\hline
+$K \in \mathbb{N}$ & $\rho = 1$ & $\frac{1}{K + 1}$
+& $\frac{1}{K + 1}$ & $\frac{K}{2}$ \\
+$K \in \mathbb{N}$ & $\rho \neq 1$
+& $\frac{1 - \rho}{1 - \rho^{K+1}} \rho^i$
+& $\frac{1 - \rho}{1 - \rho^{K+1}}$
+& $\rho \frac{1 - (K+1) \rho^K + K \rho^{K+1}}{(1 - \rho)(1 - \rho^{K+1})}$ \\
+$K = \infty$ & $\rho \geq 1$
+& $0$ & $0$ & $\infty$ \\
+$K = \infty$ & $\rho < 1$
+& $(1 - \rho) \rho^i$ & $(1 - \rho)$ & $\frac{\rho}{1 - \rho}$ \\
+\end{tabular}
+
+\appendix
+
+\section{Sage implementation}
+
+To test the derived expressions on some small parameter values,
+I implemented Sage\footnote{\url{http://www.sagemath.org/}} functions \texttt{pi} and \texttt{ei} that compute values of
+$\pi_i$ and $E[I]$ respectively.
+
+\begin{sageblock}
+import math
+def pi(i, rho, K):
+    assert i >= 0
+    assert rho >= 0
+    assert K >= 0
+    if math.isinf(K):
+        if rho >= 1:
+            return 0
+        else:
+            return (1 - rho) * rho^i
+    else:
+        if rho == 1:
+            return 1 / (K+1)
+        else:
+            return (1 - rho) * rho^i / (1 - rho^(K+1))
+\end{sageblock}
+\begin{sagesilent}
+assert pi(0, 1/2, 1) == 2/3
+assert pi(0, 2, 1) == 1/3
+\end{sagesilent}
+
+\begin{sageblock}
+import math
+def ei(rho, K):
+    assert rho >= 0
+    assert K >= 0
+    if math.isinf(K):
+        if rho >= 1:
+            return float("inf")
+        else:
+            return rho / (1 - rho)
+    else:
+        if rho == 1:
+            return K / 2
+        else:
+            return pi(0, rho, K) * \
+                rho * (1 - (K+1)*rho^K + K*rho^(K+1)) / \
+                (1 - rho)^2
+\end{sageblock}
+\begin{sagesilent}
+assert ei(1/2, 1) == 1/3
+assert ei(2, 1) == 2/3
+\end{sagesilent}
+
+\section{Example solutions}
+
+\begin{tabular}{c | c || c | c}
+$K$ & $\rho$ & $\pi_0$ & $E[I]$ \\
+\hline
+\hline
+$0$ & $\frac{1}{2}$ & $\sage{pi(0, 1/2, 0)}$ & $\sage{ei(1/2, 0)}$ \\
+$1$ & $\frac{1}{2}$ & $\sage{pi(0, 1/2, 1)}$ & $\sage{ei(1/2, 1)}$ \\
+$2$ & $\frac{1}{2}$ & $\sage{pi(0, 1/2, 2)}$ & $\sage{ei(1/2, 2)}$ \\
+$\infty$ & $\frac{1}{2}$ & $\sage{pi(0, 1/2, float("inf"))}$
+& $\sage{ei(1/2, float("inf"))}$ \\
+\hline
+$0$ & $1$ & $\sage{pi(0, 1, 0)}$ & $\sage{ei(1, 0)}$ \\
+$1$ & $1$ & $\sage{pi(0, 1, 1)}$ & $\sage{ei(1, 1)}$ \\
+$2$ & $1$ & $\sage{pi(0, 1, 2)}$ & $\sage{ei(1, 2)}$ \\
+$\infty$ & $1$ & $\sage{pi(0, 1, float("inf"))}$
+& $\sage{ei(1, float("inf"))}$ \\
+\hline
+$0$ & $2$ & $\sage{pi(0, 2, 0)}$ & $\sage{ei(2, 0)}$ \\
+$1$ & $2$ & $\sage{pi(0, 2, 1)}$ & $\sage{ei(2, 1)}$ \\
+$2$ & $2$ & $\sage{pi(0, 2, 2)}$ & $\sage{ei(2, 2)}$ \\
+$\infty$ & $2$ & $\sage{pi(0, 2, float("inf"))}$
+& $\sage{ei(2, float("inf"))}$
+\end{tabular}
+
+\bibliography{queueing}
+
+\end{document}
